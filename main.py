@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query, Body
+from fastapi import FastAPI, Query, Body, Path
 import uvicorn
 
 app = FastAPI()
@@ -34,6 +34,38 @@ def create_hotel(
         "id": hotels[-1]["id"] + 1,
         "title": title
     })
+    return {"status": "OK"}
+
+
+@app.put("/hotels/{hotel_id}")
+def update_hotel(
+        hotel_id: int = Path(),
+        title: str = Body(description="Название"),
+        name: str = Body(description="Имя")
+):
+    global hotels
+    for hotel in hotels:
+        if hotel["id"] == hotel_id:
+            hotel["title"] = title
+            hotel["name"] = name
+    return {"status": "OK"}
+
+
+@app.patch("/hotels/{hotel_id}")
+def partially_update_hotel(
+        hotel_id: int = Path(description="Айдишник отеля"),
+        title: str | None = Body(None, description="Название отеля"),
+        name: str | None = Body(None, description="Название курорта")
+):
+    if title and name:
+        update_hotel(hotel_id, title, name)
+    else:
+        for hotel in hotels:
+            if hotel["id"] == hotel_id:
+                if title:
+                    hotel["title"] = title
+                if name:
+                    hotel["name"] = name
     return {"status": "OK"}
 
 
