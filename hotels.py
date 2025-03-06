@@ -32,7 +32,11 @@ def get_hotel(
         if title and hotel["title"] != title:
             continue
         hotels_.append(hotel)
-    return hotels_[0:per_page]
+
+    quotient, remainder = divmod(len(hotels_), per_page)
+    page_count = quotient + (remainder > 0)
+    page = page_count if page % page_count == 0 else page % page_count
+    return hotels_[0 if page == 1 else per_page * (page - 1):per_page * page]
 
 
 # body, request body
