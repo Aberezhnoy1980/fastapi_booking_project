@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Query, Body
 
-from schemas.hotels import Hotel, HotelPATCH
+from src.schemas.hotels import Hotel, HotelPATCH
 from templates.openapi_examples import post_examples as post_exs
+from src.api.dependencies import PaginationDep
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])
 
@@ -20,10 +21,9 @@ hotels = [
             summary="Получение данных по отелю",
             description="<h2>Возвращает данные по отелю или группе или всем</h2>")
 def get_hotel(
+        pagination: PaginationDep,
         id: int | None = Query(None, description="Идентификатор отеля"),
-        title: str | None = Query(None, description="Название отеля"),
-        page: int | None = Query(1, description="Номер страницы"),
-        per_page: int | None = Query(3, description="Количество записей на странице")
+        title: str | None = Query(None, description="Название отеля")
 ):
     hotels_ = []
     for hotel in hotels:
@@ -33,10 +33,11 @@ def get_hotel(
             continue
         hotels_.append(hotel)
 
-    quotient, remainder = divmod(len(hotels_), per_page)
+    quotient, remainder = divmod(len(hotels_), pagination.per_page)
     page_count = quotient + (remainder > 0)
-    page = page_count if page % page_count == 0 else page % page_count
-    return hotels_[0 if page == 1 else per_page * (page - 1):per_page * page]
+    page = page_count if pagination.page % page_count == 0 else pagination.page % page_count
+    # return hotels_[pagination.per_page * (pagination.page - 1):pagination.per_page * pagination.page]
+    return hotels_[pagination.per_page * (page - 1):][:pagination.per_page]
 
 
 # body, request body
