@@ -1,7 +1,7 @@
 ## Run app
 
 ```SHELL
-python3 main.py
+python3 src/main.py
 ```
 <hr>
 
@@ -19,8 +19,18 @@ docker compose --project-directory ./database up
 alembic revision --autogenerate -m "initial migration"
 ```
 
+`"initial migration"` - пользовательское имя миграции
+
 ### Migration
 
 ```SHELL
 alembic upgrade head
 ```
+
+### Rollback
+
+```SHELL
+alembic downgrade 7a3c7870706b
+```
+
+`7a3c7870706b` - номер предыдущей ревизии. Можно указать значение `-1`
