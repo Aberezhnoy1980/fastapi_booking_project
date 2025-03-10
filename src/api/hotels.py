@@ -1,9 +1,6 @@
 from fastapi import APIRouter, Query, Body
 
-from sqlalchemy import insert, select, and_, func
-
-from src.database import async_session_maker, engine
-from src.models.hotels import HotelsOrm
+from src.database import async_session_maker
 from src.repositories.hotels import HotelsRepository
 from src.schemas.hotels import Hotel, HotelPATCH
 from templates.openapi_examples import post_examples as post_exs
@@ -36,7 +33,7 @@ async def get_hotel(
              description="<h2>Добавляет запись об отеле</h2>")
 async def create_hotel(hotel_data: Hotel = Body(openapi_examples=post_exs)):
     async with async_session_maker() as session:
-        hotel = await HotelsRepository(session).add(hotel_data.model_dump())
+        hotel = await HotelsRepository(session).add(hotel_data)
         await session.commit()
     return {"status": "OK", "data": hotel}
 
