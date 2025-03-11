@@ -32,3 +32,24 @@ class HotelsRepository(BaseRepository):
         result = await self.session.execute(query)
 
         return result.scalars().all()
+
+    async def get_one_or_none(
+            self,
+            id: int | None,
+            title: str | None = None,
+            location: str | None = None,
+    ):
+        query = select(HotelsOrm)
+        filters = []
+        if id is not None:
+            query = query.filter_by(id=id)
+        if location:
+            filters.append(HotelsOrm.location.icontains(location.strip().lower()))
+        if title:
+            filters.append(HotelsOrm.title.icontains(title.strip().lower()))
+        if filters:
+            query = query.filter(and_(*filters))
+
+        print(query.compile(engine, compile_kwargs={"literal_binds": True}))
+        result = await self.session.execute(query)
+        return result.scalars().one_or_none()

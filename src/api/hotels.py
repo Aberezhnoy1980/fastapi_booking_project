@@ -1,10 +1,13 @@
-from fastapi import APIRouter, Query, Body
+from fastapi import APIRouter, Query, Body, Path
 
 from src.database import async_session_maker
 from src.repositories.hotels import HotelsRepository
 from src.schemas.hotels import Hotel, HotelPATCH
 from templates.openapi_examples import post_examples as post_exs
 from src.api.dependencies import PaginationDep
+
+from sqlalchemy.exc import MultipleResultsFound
+from src.exceptions.exc import HotelNotFound
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])
 
@@ -29,6 +32,25 @@ async def get_hotel(
         )
 
 
+@router.get("/{hotel_id}")
+async def get_hotel_by_id(
+        hotel_id: int = Path()
+):
+    async with async_session_maker() as session:
+        try:
+            result = await HotelsRepository(session).get_one_or_none(id=hotel_id)
+            if result is None:
+                raise HotelNotFound(hotel_id)
+            return result
+        except MultipleResultsFound:
+            print("Найдено несколько записей. Непонятно как такое могло выйти")
+            raise
+        except HotelNotFound:
+            print("Отель не найден")
+            raise
+        # return await HotelsRepository(session).get_hotel_by_id(hotel_id)
+
+
 @router.post(
     "",
     summary="Добавление отеля",
@@ -42,7 +64,7 @@ async def create_hotel(hotel_data: Hotel = Body(openapi_examples=post_exs)):
 
 
 @router.put(
-    "/{id}",
+    "/{hotel_id}",
     summary="Обновление данных об отеле",
     description="<h2>Обновляет данные об отеле. Требуются все параметры (поля/свойства сущности/модели)</h2>"
 )
@@ -57,7 +79,7 @@ async def update_hotel(
 
 
 @router.patch(
-    "/{id}",
+    "/{hotel_id}",
     summary="Частичное обновление данных об отеле",
     description="<h2>Здесь мы частично обновляем данные для отеля</h2>"
 )
@@ -76,11 +98,11 @@ async def partially_update_hotel(
 
 
 @router.delete(
-    "/{id}",
+    "/{hotel_id}",
     summary="Удаление отеля",
     description="<h2>Удаляет запись об отеле из базы данных</h2>"
 )
-async def delete_hotel(hotel_id: int):
+async def delete_hotel(hotel_id: int = Path()):
     async with async_session_maker() as session:
         return_message = {"status": "OK"}
         await HotelsRepository(session).delete(id=hotel_id)

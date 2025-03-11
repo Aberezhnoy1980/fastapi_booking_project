@@ -22,6 +22,11 @@ class BaseRepository:
 
         return result.scalars().one_or_one()
 
+    async def get_hotel_by_id(self, data_id: int):
+        query = select(self.model).filter_by(id=data_id)
+        result = await self.session.execute(query)
+        return result.scalars().one()
+
     async def add(self, data: BaseModel):
         add_data_stmt = (
             insert(self.model)
