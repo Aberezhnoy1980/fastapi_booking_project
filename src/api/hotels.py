@@ -1,10 +1,13 @@
 from fastapi import APIRouter, Query, Body
 
 from src.database import async_session_maker
+from src.exceptions.exc import HotelNotFound
 from src.repositories.hotels import HotelsRepository
-from src.schemas.hotels import Hotel, HotelPATCH
+from src.schemas.hotels import Hotel, HotelPATCH, HotelDELETE
 from templates.openapi_examples import post_examples as post_exs
 from src.api.dependencies import PaginationDep
+from sqlalchemy.exc import MultipleResultsFound
+
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])
 
@@ -38,39 +41,36 @@ async def create_hotel(hotel_data: Hotel = Body(openapi_examples=post_exs)):
     return {"status": "OK", "data": hotel}
 
 
-@router.put("/{hotel_id}",
+@router.put("/{id}",
             summary="Обновление данных об отеле",
             description="<h2>Обновляет данные об отеле. Требуются все параметры (поля/свойства сущности/модели)</h2>")
-def update_hotel(hotel_id: int, hotel_data: Hotel):
-    global hotels
-    for hotel in hotels:
-        if hotel["id"] == hotel_id:
-            hotel["title"] = hotel_data.title
-            hotel["name"] = hotel_data.name
+async def update_hotel(hotel_id: int, hotel_data: Hotel):
+    async with async_session_maker() as session:
+        await HotelsRepository(session).edit(hotel_id, hotel_data)
+        await session.commit()
     return {"status": "OK"}
 
 
-@router.patch("/{hotel_id}",
+@router.patch("/{id}",
               summary="Частичное обновление данных об отеле",
               description="<h2>Здесь мы частично обновляем данные для отеля</h2>")
 def partially_update_hotel(hotel_id: int, hotel_data: HotelPATCH):
-    for hotel in hotels:
-        if hotel["id"] == hotel_id:
-            if hotel_data.title:
-                hotel["title"] = hotel_data.title
-            if hotel_data.name:
-                hotel["name"] = hotel_data.name
+
     return {"status": "OK"}
 
 
-@router.delete("/{hotel_id}",
+@router.delete("/{id}",
                summary="Удаление отеля",
                description="<h2>Удаляет запись об отеле из базы данных</h2>")
-def delete_hotel(hotel_id: int):
-    # for hotel in hotels:
-    #     if hotel["id"] == hotel_id:
-    #         hotels.remove(hotel)
-    # hotels.remove({hotel for hotel in hotels if hotel["id"] == hotel_id}.pop())
-    global hotels
-    hotels = [hotel for hotel in hotels if hotel["id"] != hotel_id]
-    return {"status": "OK"}
+async def delete_hotel(id: int):
+    async with async_session_maker() as session:
+        return_message = {"status": "OK"}
+        # try:
+        #     await HotelsRepository(session).delete_by_filters(**hotel_data.model_dump())
+        # except MultipleResultsFound:
+        #     return_message = {"status": 422}
+        # except HotelNotFound:
+        #     return_message = {"status": 404}
+        # await HotelsRepository(session).delete(id)
+        await session.commit()
+    return return_message

@@ -1,7 +1,9 @@
 from sqlalchemy import select, insert, delete, update
 from pydantic import BaseModel
+from sqlalchemy.exc import MultipleResultsFound
 
 from src.database import engine
+from src.exceptions.exc import HotelNotFound
 
 
 class BaseRepository:
@@ -27,3 +29,26 @@ class BaseRepository:
         print(add_data_stmt.compile(engine, compile_kwargs={"literal_binds": True}))
         result = await self.session.execute(add_data_stmt)
         return result.scalars().one()
+
+    async def edit(self, id: int, data: BaseModel):
+        update_data_stmt = update(self.model).values(**data.model_dump()).filter_by(id=id)
+        print(update_data_stmt.compile(engine, compile_kwargs={"literal_binds": True}))
+        await self.session.execute(update_data_stmt)
+
+    async def delete(self, id):
+        delete_data_stmt = delete(self.model).filter_by(id=id)
+        print(delete_data_stmt.compile(engine, compile_kwargs={"literal_binds": True}))
+        await self.session.execute(delete_data_stmt)
+
+    async def delete_by_filters(self, **filter_by):
+        try:
+            hotel = await self.get_one_or_none(**filter_by)
+            id = hotel._mapping["id"]
+            if id is None:
+                raise HotelNotFound()
+        except MultipleResultsFound:
+            raise
+        except HotelNotFound:
+            raise
+
+        await self.delete(id)

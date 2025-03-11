@@ -9,3 +9,9 @@ class Hotel(BaseModel):
 class HotelPATCH(BaseModel):
     title: str | None = Field(None, description="Название отеля")
     location: str | None = Field(None, description="Название курорта")
+
+
+class HotelDELETE(BaseModel):
+    id: int | None = Field(None, description="Идентификатор отеля")
+    title: str | None = Field(None, description="Название отеля")
+    location: str | None = Field(None, description="Название курорта")
