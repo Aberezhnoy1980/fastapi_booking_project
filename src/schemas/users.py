@@ -16,3 +16,7 @@ class User(BaseModel):
     email: EmailStr = Field(description="Электронная почта пользователя. Используется в том числе в качестве логина")
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class UserWithHashedPassword(User):
+    hashed_password: str = Field(description="Хэшированный пароль")
