@@ -66,5 +66,5 @@ INSERT INTO hotels (title, location) VALUES ('Уютный дворик', 'Ме�
 
 INSERT INTO hotels (title, location) VALUES ('Поля', 'Краснодар, ул. Петра Метальникова, 1') RETURNING hotels.id, hotels.title, hotels.location;
 
-delete from hotels where id > 17;
+delete from hotels where id > 80;
 

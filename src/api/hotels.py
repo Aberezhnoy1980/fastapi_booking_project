@@ -2,8 +2,8 @@ from fastapi import APIRouter, Query, Body, Path
 
 from src.database import async_session_maker
 from src.repositories.hotels import HotelsRepository
-from src.schemas.hotels import Hotel, HotelPATCH
-from templates.openapi_examples import post_examples as post_exs
+from src.schemas.hotels import HotelPATCH, HotelAdd
+from templates.openapi_examples import hotel_examples
 from src.api.dependencies import PaginationDep
 
 from sqlalchemy.exc import MultipleResultsFound
@@ -56,7 +56,7 @@ async def get_hotel_by_id(
     summary="Добавление отеля",
     description="<h2>Добавляет запись об отеле</h2>"
 )
-async def create_hotel(hotel_data: Hotel = Body(openapi_examples=post_exs)):
+async def create_hotel(hotel_data: HotelAdd = Body(openapi_examples=hotel_examples)):
     async with async_session_maker() as session:
         hotel = await HotelsRepository(session).add(hotel_data)
         await session.commit()
@@ -70,7 +70,7 @@ async def create_hotel(hotel_data: Hotel = Body(openapi_examples=post_exs)):
 )
 async def update_hotel(
         hotel_id: int,
-        hotel_data: Hotel = Body()
+        hotel_data: HotelAdd = Body()
 ):
     async with async_session_maker() as session:
         await HotelsRepository(session).edit(hotel_data, id=hotel_id)

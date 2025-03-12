@@ -3,6 +3,16 @@
 ```SHELL
 python3 src/main.py
 ```
+
+Варианты:
+
+```SHELL
+fastapi dev main.py
+```
+
+```SHEL
+uvicorn main:app --reload
+```
 <hr>
 
 ## Start DB
