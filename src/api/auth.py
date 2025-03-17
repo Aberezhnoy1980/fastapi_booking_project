@@ -14,7 +14,8 @@ router = APIRouter(prefix="/auth", tags=["Авторизация и аутент
 @router.post(
     "/register",
     summary="Регистрация нового пользователя",
-    description="<h2>Добавляет запись в базу данных если пользователь не существует</h2>")
+    description="<h2>Добавляет запись в базу данных если пользователь не существует</h2>"
+)
 async def register_user(
         data: UserRequestAdd = Body(openapi_examples=user_examples),
 ):

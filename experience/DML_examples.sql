@@ -68,3 +68,4 @@ INSERT INTO hotels (title, location) VALUES ('Поля', 'Краснодар, у
 
 delete from hotels where id > 80;
 
+select * from users;

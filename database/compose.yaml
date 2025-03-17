@@ -34,18 +34,18 @@ services:
       - "-c"
       - "pg_stat_statements.track=all"
     environment:
-      POSTGRES_DB: "booking"
-      POSTGRES_USER: "bookinguser"
-      POSTGRES_PASSWORD: "pg4booking"
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
       PGDATA: "/var/lib/postgresql/data/pgdata"
     volumes:
       - ./init_sql/:/docker-entrypoint-initdb.d
       - ./booking-data:/var/lib/postgresql/data
 #      - ./postgresql.conf:/etc/postgresql.conf:ro
     ports:
-      - "6432:5432"
+      - "${DB_PORT}:5432"
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U bookinguser -d booking" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -63,9 +63,9 @@ services:
     container_name: exporter_container_for_booking
     image: prometheuscommunity/postgres-exporter:v0.10.1
     environment:
-      DATA_SOURCE_URI: "postgres:5432/booking?sslmode=disable"
-      DATA_SOURCE_USER: "bookinguser"
-      DATA_SOURCE_PASS: "pg4booking"
+      DATA_SOURCE_URI: "postgres:5432/${DB_NAME}?sslmode=disable"
+      DATA_SOURCE_USER: ${DB_USER}
+      DATA_SOURCE_PASS: ${DB_PASS}
       PG_EXPORTER_EXTEND_QUERY_PATH: "/etc/postgres_exporter/queries.yaml"
     volumes:
       - ./queries.yaml:/etc/postgres_exporter/queries.yaml:ro
