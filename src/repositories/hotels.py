@@ -17,12 +17,12 @@ class HotelsRepository(BaseRepository):
             limit,
             offset,
     ):
-        query = select(HotelsOrm)
+        query = select(self.model)
         filters = []
         if location:
-            filters.append(HotelsOrm.location.icontains(location.strip().lower()))
+            filters.append(self.model.location.icontains(location.strip().lower()))
         if title:
-            filters.append(func.lower(HotelsOrm.title).contains(title.strip().lower()))
+            filters.append(func.lower(self.model.title).contains(title.strip().lower()))
         if filters:
             query = query.filter(and_(*filters))
         query = (
@@ -41,14 +41,14 @@ class HotelsRepository(BaseRepository):
             title: str | None = None,
             location: str | None = None,
     ):
-        query = select(HotelsOrm)
+        query = select(self.model)
         filters = []
         if id is not None:
             query = query.filter_by(id=id)
         if location:
-            filters.append(HotelsOrm.location.icontains(location.strip().lower()))
+            filters.append(self.model.location.icontains(location.strip().lower()))
         if title:
-            filters.append(HotelsOrm.title.icontains(title.strip().lower()))
+            filters.append(self.model.title.icontains(title.strip().lower()))
         if filters:
             query = query.filter(and_(*filters))
 

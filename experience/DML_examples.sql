@@ -69,3 +69,33 @@ INSERT INTO hotels (title, location) VALUES ('Поля', 'Краснодар, у
 delete from hotels where id > 80;
 
 select * from users;
+
+
+select * from rooms;
+
+insert into rooms (hotel_id, title, description, price, quantity)
+values (1, 'Econome', 'Eco', 200, 100);
+
+delete from rooms where id = 4;
+
+SELECT rooms.id, rooms.hotel_id, rooms.title, rooms.description, rooms.price, rooms.quantity 
+FROM rooms 
+WHERE rooms.hotel_id = 1;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

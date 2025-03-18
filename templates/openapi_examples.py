@@ -27,3 +27,24 @@ user_examples = {
         }
     }
 }
+
+room_examples = {
+    "1": {
+        "summary": "Room1", "value": {
+            "hotel_id": None,
+            "title": "Luxe",
+            "description": "Premium comfort and highest quality",
+            "price": 1000,
+            "quantity": 2
+        }
+    },
+    "2": {
+        "summary": "Room2", "value": {
+            "hotel_id": None,
+            "title": "Comfort",
+            "description": "Standard service",
+            "price": 450,
+            "quantity": 12
+        }
+    }
+}

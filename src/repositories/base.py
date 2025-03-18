@@ -1,5 +1,6 @@
 from sqlalchemy import select, insert, delete, update
 from pydantic import BaseModel
+from sqlalchemy.exc import IntegrityError
 
 from src.database import engine
 
@@ -24,7 +25,7 @@ class BaseRepository:
             return None
         return self.schema.model_validate(model, from_attributes=True)
 
-    async def get_hotel_by_id(self, data_id: int):
+    async def get_data_by_id(self, data_id: int):
         query = select(self.model).filter_by(id=data_id)
         result = await self.session.execute(query)
         model = result.scalars().one()
@@ -37,7 +38,10 @@ class BaseRepository:
             .returning(self.model)
         )
         print(add_data_stmt.compile(engine, compile_kwargs={"literal_binds": True}))
-        result = await self.session.execute(add_data_stmt)
+        try:
+            result = await self.session.execute(add_data_stmt)
+        except IntegrityError:
+            raise
         model = result.scalars().one()
         return self.schema.model_validate(model)
 
@@ -46,11 +50,14 @@ class BaseRepository:
             exclude_unset: bool = False,
             **filter_by
     ):
-        update_data_stmt = (
-            update(self.model)
-            .filter_by(**filter_by)
-            .values(**data.model_dump(exclude_unset=exclude_unset))
-        )
+        try:
+            update_data_stmt = (
+                update(self.model)
+                .filter_by(**filter_by)
+                .values(**data.model_dump(exclude_unset=exclude_unset))
+            )
+        except IntegrityError:
+            raise
         print(update_data_stmt.compile(engine, compile_kwargs={"literal_binds": True}))
         await self.session.execute(update_data_stmt)
 
