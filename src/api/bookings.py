@@ -8,6 +8,28 @@ from src.utils.openapi_examples import booking_examples
 router = APIRouter(prefix="/bookings", tags=["Бронирования"])
 
 
+@router.get(
+    "",
+    summary="Получение всех бронирований",
+    description="Возвращает список всех бронирований из базы данных")
+async def get_bookings(
+        db: DBDep
+):
+    return await db.bookings.get_all()
+
+
+@router.get(
+    "/me",
+    summary="Получение бронирований текущего пользователя",
+    description="Возвращает список бронирований отфильтрованных по идентификатору пользователя"
+)
+async def get_user_bookings(
+        db: DBDep,
+        user_id: UserIdDep
+):
+    return await db.bookings.get_filtered(user_id=user_id)
+
+
 @router.post(
     "",
     summary="Добавление бронирования",
