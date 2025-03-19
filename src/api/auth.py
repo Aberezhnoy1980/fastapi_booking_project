@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from src.api.dependencies import UserIdDep, DBDep
 from src.schemas.users import UserRequestAdd, UserAdd
 from src.services.auth import AuthService
-from templates.openapi_examples import user_examples
+from src.utils.openapi_examples import user_examples
 
 router = APIRouter(prefix="/auth", tags=["Авторизация и аутентификация"])
 

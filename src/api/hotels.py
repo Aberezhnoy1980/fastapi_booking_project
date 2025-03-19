@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Query, Body, Path
 
 from src.schemas.hotels import HotelPATCH, HotelAdd
-from templates.openapi_examples import hotel_examples
+from src.utils.openapi_examples import hotel_examples
 from src.api.dependencies import PaginationDep, DBDep
 
 from sqlalchemy.exc import MultipleResultsFound

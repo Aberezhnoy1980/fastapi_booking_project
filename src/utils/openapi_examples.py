@@ -48,3 +48,20 @@ room_examples = {
         }
     }
 }
+
+booking_examples = {
+    "1": {
+        "summary": "Booking1", "value": {
+            "room_id": 1,
+            "date_from": "2025-01-13",
+            "date_to": "2025-02-14"
+        }
+    },
+    "2": {
+        "summary": "Booking2", "value": {
+            "room_id": 2,
+            "date_from": "2025-12-01",
+            "date_to": "2026-01-14"
+        }
+    }
+}

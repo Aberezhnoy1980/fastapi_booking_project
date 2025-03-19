@@ -3,7 +3,7 @@ from sqlalchemy.exc import NoResultFound, IntegrityError
 
 from src.api.dependencies import DBDep
 from src.schemas.rooms import RoomAdd, RoomPatch, RoomAddRequest, RoomPatchRequest
-from templates.openapi_examples import room_examples
+from src.utils.openapi_examples import room_examples
 
 router = APIRouter(prefix="/hotels", tags=["Номера"])
 
@@ -113,6 +113,9 @@ async def delete_room(
         hotel_id: int = Path(),
         room_id: int = Path()
 ):
-    await db.rooms.delete(id=room_id, hotel_id=hotel_id)
+    try:
+        await db.rooms.delete(id=room_id, hotel_id=hotel_id)
+    except NoResultFound as e:
+        raise HTTPException(status_code=404, detail=f"Room with id {room_id} not found") from e
     await db.commit()
     return {"status": f"Successfully deleted room with id {room_id}"}
