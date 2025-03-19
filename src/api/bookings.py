@@ -5,7 +5,7 @@ from src.api.dependencies import DBDep, UserIdDep
 from src.schemas.bookings import BookingAddRequest, BookingAdd
 from src.utils.openapi_examples import booking_examples
 
-router = APIRouter(prefix="/booking", tags=["Бронирования"])
+router = APIRouter(prefix="/bookings", tags=["Бронирования"])
 
 
 @router.post(
@@ -23,10 +23,9 @@ async def create_booking(
     except NoResultFound as e:
         raise HTTPException(status_code=404, detail=f"Room with id {booking_data.room_id} not found") from e
 
-    _price = room.model_dump()["price"]
-    _booking_data = BookingAdd(user_id=user_id, price=_price, **booking_data.model_dump())
+    room_price: int = room.price
+    _booking_data = BookingAdd(user_id=user_id, price=room_price, **booking_data.model_dump())
 
     booking = await db.bookings.add(_booking_data)
-
     await db.commit()
     return {"status": "OK", "data": booking}
